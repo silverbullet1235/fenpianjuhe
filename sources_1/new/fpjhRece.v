@@ -115,8 +115,16 @@ reg [11:0] read_fifo_read_cycles = 'd0;
 reg [11:0] delay_cnt = 'd0;  // 用于延迟读取的计数器
 reg [11:0] atest = 'd0;
 reg [11:0] btest = 'd0;
-
-
+reg [11:0] accumulated_length = 'd0;
+reg dataSlice_valid = 'd0;
+wire [31:0] dataSlice_data;
+reg [3:0]  dataSlice_keep = 'd0;
+wire        dataSlice_last;
+assign dataSlice_data = readFIFO1_Dout;
+assign dataSlice_last = !readFIFO1_rdEn && dataSlice_valid;
+reg [11:0] padding_count = 'd0; // 填充5A的长度 // 填充的字节数为1-11
+reg [11:0] padding_count_divBy4 = 'd0; // padding_count 中整4的倍数
+reg [11:0] delay_cnt_5A = 'd0;  // 用于延迟5A读取的计数器
 always @(posedge clk) begin
     if (rst) begin
         dinCnt <= 'd0;
@@ -128,6 +136,7 @@ always @(posedge clk) begin
         frameType_1Bit_Reg <= 'd0;
         dataSliceState <= IDLE;
 		delay_cnt <= 'd0;
+		accumulated_length <= 'd0;
     end
     else begin
 		fifoc1DataOut_Dy1 <= fifo1DataOut;
@@ -141,6 +150,7 @@ always @(posedge clk) begin
 					fifo_read_cycles		<= 'd0; // 重置计数器
 					read_fifo_read_cycles	<= 'd0; // 重置计数器
 					delay_cnt <= 'd0;
+					delay_cnt_5A <= 'd0;
                 end
             end
             READ_FRAME_TYPE: begin
@@ -200,7 +210,7 @@ always @(posedge clk) begin
             end
             READ_HEADER: begin //////分四个状态
 				fragmentLengthAddhead <= (frameType_16Bit[0])?'d11 + fragment_length:'d7 + fragment_length;
-				
+
 						if (frameType_1Bit_Reg) begin
 							if (fifo1DataValid) begin
 								case(readFIFO_remainLen_reg)
@@ -227,11 +237,13 @@ always @(posedge clk) begin
 								dataSliceState <= SEND_DATA;
 								// readFIFO1_rdEn <= 'd1;
 								// readFIFO1_DoutIndex <= 4'd4;
+								accumulated_length <= accumulated_length;
 							end
 							else begin
 								fifo1DataRd <= 'd0;
 								// readFIFO1_rdEn <= 'd1;
 								// readFIFO1_DoutIndex <= 4'd4;
+								accumulated_length <= 'd11 + fragment_length + accumulated_length;
 							end
 						end
 						else begin
@@ -239,7 +251,10 @@ always @(posedge clk) begin
 							total_bytes_to_read <= 'd7 + fragment_length; // 帧头(3)+数据+帧尾(4)
 							bytes_processed <= 'd0;
 							dataSliceState <= SEND_DATA;
-							// readFIFO1_r/
+							// accumulated_length <= 'd7 + fragment_length + accumulated_length; // 如果已经是5帧头的帧类型，直接计算剩余 padding_count
+							padding_count <= 'd848 - accumulated_length -'d7 - fragment_length;/////////////
+							accumulated_length <= 'd0;/////////////
+							padding_count_divBy4 <= ('d848 - accumulated_length -'d7 - fragment_length) >> 2;
 						end
 				
 
@@ -294,29 +309,99 @@ always @(posedge clk) begin
 							// 下一个时钟周期停止读取
 							readFIFO1_rdEn <= 1'b0;
 							readFIFO1_DoutIndex <= 4'd0;
+
+
 							dataSliceState <= WAIT_END;
 						end
 					end
+					delay_cnt_5A <= 'd0;
 
 					
             end
             WAIT_END: begin
-                fifo1DataRd <= 'd0;
-				readFIFO1_rdEn <= 1'b0;
-				readFIFO1_DoutIndex <= 4'd0;
-                dinCnt <= 'd0;
-                dataSliceState <= IDLE;
+                // fifo1DataRd <= 'd0;
+				// readFIFO1_rdEn <= 1'b0;
+				// readFIFO1_DoutIndex <= 4'd0;
+
+
+				case(padding_count_divBy4)
+					'd2:begin
+						padding_count_divBy4 <= padding_count_divBy4 - 'd1;
+						fifo1DataRd <= 'd1;
+					end
+					'd1:begin
+						padding_count_divBy4 <= padding_count_divBy4 - 'd1;
+						fifo1DataRd <= 'd1;
+					end
+					'd0:begin
+						padding_count_divBy4 <= padding_count_divBy4;
+						fifo1DataRd <= 'd0;
+					end
+				endcase
+
+
+				// 信号延迟读取
+				delay_cnt_5A <= delay_cnt_5A + 1'b1;  //可以用来区分读出的是’5A‘还是有效数据
+				if (delay_cnt_5A >= 3'd2) begin
+
+					case(padding_count)
+						4'd0:begin
+							readFIFO1_rdEn <= 'd0;
+							readFIFO1_DoutIndex <= 'd0;
+							padding_count <= 'd0;
+							dataSliceState <= IDLE;
+							
+						end
+						4'd1:begin
+							readFIFO1_rdEn <= 'd1;
+							readFIFO1_DoutIndex <= 'd1;
+							padding_count <= 'd0;
+readFIFO_remainLen = 'd0;
+readFIFO_remain = 'd0;
+
+						end 
+						4'd2: begin
+							readFIFO1_rdEn <= 'd1;
+							readFIFO1_DoutIndex <= 'd2;
+							padding_count <= 4'd0;
+readFIFO_remainLen = 'd0;
+readFIFO_remain = 'd0;
+						end
+						4'd3: begin
+							readFIFO1_rdEn <= 'd1;
+							readFIFO1_DoutIndex <= 'd3;
+							padding_count <= 4'd0;
+readFIFO_remainLen = 'd0;
+readFIFO_remain = 'd0;
+						end
+						4'd4: begin
+							readFIFO1_rdEn <= 'd1;
+							readFIFO1_DoutIndex <= 'd4;
+							padding_count <= 'd0;
+readFIFO_remainLen = 'd0;
+readFIFO_remain = 'd0;
+						end
+						default: begin
+							readFIFO1_rdEn <= 'd1;
+							readFIFO1_DoutIndex <= 'd4;
+							padding_count <= padding_count - 'd4;
+						end
+					endcase
+
+				end
+
+
             end
             default: dataSliceState <= IDLE;
         endcase
     end
 end
-reg dataSlice_valid = 'd0;
-wire [31:0] dataSlice_data;
-reg [3:0]  dataSlice_keep = 'd0;
-wire        dataSlice_last;
-assign dataSlice_data = readFIFO1_Dout;
-assign dataSlice_last = !readFIFO1_rdEn && dataSlice_valid;
+
+
+
+
+
+
 always@(posedge clk)begin
 	if(rst)begin
 		dataSlice_valid <= 'd0;
@@ -328,17 +413,20 @@ always@(posedge clk)begin
 	end
 end
 
+// 去掉输出数据中的5A
+wire		dataSlice_valid_no5A	;
+wire [31:0]	dataSlice_data_no5A		;
+wire [3:0]	dataSlice_keep_no5A		;
+wire		dataSlice_last_no5A		;
+assign dataSlice_valid_no5A = (delay_cnt_5A > 'd1)? 'd0 : dataSlice_valid;
+assign dataSlice_data_no5A = (delay_cnt_5A > 'd1)? 'd0: dataSlice_data ;
+assign dataSlice_keep_no5A = (delay_cnt_5A > 'd1)? 'd0: dataSlice_keep ;
+assign dataSlice_last_no5A = (delay_cnt_5A > 'd1)? 'd0: dataSlice_last ;
 
-// readChange_FIFO readFIFO(
-//     .clk         (clk					),
-//     .rst_n       (!rst					),
-//     .Din         (fifo1DataOut			),
-//     .Din_index   (readFIFO1_DoutIndex	),
-//     .wr_en       (fifo1DataValid		),
-//     .rd_en       (readFIFO1_rdEn		),
-//     .Dout        (readFIFO1_Dout		),
-//     .index       (readFIFO1_index		)
-// );
+
+
+
+
 
 
 		// Dy1dinNd	<= i_axis_tvalid	;

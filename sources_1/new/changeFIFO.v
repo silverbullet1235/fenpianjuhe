@@ -33,7 +33,10 @@ module changeFIFO(
 );
 
 wire [31:0]     Din_swap;
-reg  [255:0]    fifo_data;  // 32字节暂存区
+// reg  [255:0]    fifo_data;  // 32字节暂存区
+reg  [319:0]    fifo_data;  //  1272
+// reg  [287:0]    fifo_data;  // 32字节暂存区 6880
+// reg  [511:0]    fifo_data;  // 6720
 
 assign Din_swap = {Din[7:0], Din[15:8], Din[23:16], Din[31:24]};
 
