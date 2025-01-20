@@ -41,23 +41,23 @@ end
 
 reg [31:0]  count           ;
 reg [11:0]  i_length         ;
+reg         i_axis_tvalid    ;
 reg [31:0]  i_axis_tdata     ;
 reg [03:0]  i_axis_tkeep     ;
-reg         i_axis_tvalid    ;
 reg         i_axis_tlast     ;
 wire        i_axis_tready    ;
+wire        o_axis_tvalid    ;
 wire[31:0]  o_axis_tdata     ;
 wire[03:0]  o_axis_tkeep     ;
-wire        o_axis_tvalid    ;
 wire        o_axis_tlast     ;
 reg         o_axis_tready    ;
+// wire        i_axis_rvalid;
 // wire[31:0]  i_axis_rdata ;
 // wire[03:0]  i_axis_rkeep ;
-// wire        i_axis_rvalid;
 // wire        i_axis_rlast ;
+wire        o_axis_rvalid;
 wire[31:0]  o_axis_rdata;
 wire[03:0]  o_axis_rkeep ;
-wire        o_axis_rvalid;
 wire        o_axis_rlast ;
 reg        o_axis_rready;
 wire[31:0]  o_length ;
@@ -67,22 +67,35 @@ wire[31:0]  o_length ;
 // localparam cnt_FixLength_1 	= 30	;    // 第一种数据长度  250 可以
 // localparam cnt_FixLength_2 	= 210	;    // 第二种数据长度
 // localparam cnt_FixLength_3 	= 500	;    // 第三种数据长度
-// localparam cnt_GapLength_1 	= 123	;    // 第一种间隙长度
-// localparam cnt_GapLength_2 	= 123	;    // 第二种间隙长度
-// localparam cnt_GapLength_3 	= 123	;    // 第三种间隙长度
-// localparam keep_LastclkByte = 15	; // 8 12 14 15 // 3 2 1 0
+// localparam cnt_GapLength_1 	= 80	;    // 第一种间隙长度
+// localparam cnt_GapLength_2 	= 80	;    // 第二种间隙长度
+// localparam cnt_GapLength_3 	= 80	;    // 第三种间隙长度
+// localparam keep_LastclkByte = 14	; // 8 12 14 15 // 3 2 1 0
 // localparam cnt_LastclkByte = 4 - $clog2(16-keep_LastclkByte);
 // localparam cnt_FixLengthByte_1 = cnt_FixLength_1 * 4 - 4 + cnt_LastclkByte;
 // localparam cnt_FixLengthByte_2 = cnt_FixLength_2 * 4 - 4 + cnt_LastclkByte;
 // localparam cnt_FixLengthByte_3 = cnt_FixLength_3 * 4 - 4 + cnt_LastclkByte;
 
-// 测试长度方案2
-localparam cnt_FixLength_1 = 208;    // 第一种数据长度  250 可以
-localparam cnt_FixLength_2 = 208;    // 第二种数据长度
-localparam cnt_FixLength_3 = 208;    // 第三种数据长度
-localparam cnt_GapLength_1 = 103;    // 第一种间隙长度
-localparam cnt_GapLength_2 = 103;    // 第二种间隙长度
-localparam cnt_GapLength_3 = 103;    // 第三种间隙长度
+// // 测试长度方案2
+// localparam cnt_FixLength_1 = 208;    // 第一种数据长度  250 可以
+// localparam cnt_FixLength_2 = 208;    // 第二种数据长度
+// localparam cnt_FixLength_3 = 208;    // 第三种数据长度
+// localparam cnt_GapLength_1 = 103;    // 第一种间隙长度
+// localparam cnt_GapLength_2 = 103;    // 第二种间隙长度
+// localparam cnt_GapLength_3 = 103;    // 第三种间隙长度
+// localparam keep_LastclkByte = 8; // 8 12 14 15 // 3 2 1 0
+// localparam cnt_LastclkByte = 4 - $clog2(16-keep_LastclkByte);
+// localparam cnt_FixLengthByte_1 = cnt_FixLength_1 * 4 - 4 + cnt_LastclkByte;
+// localparam cnt_FixLengthByte_2 = cnt_FixLength_2 * 4 - 4 + cnt_LastclkByte;
+// localparam cnt_FixLengthByte_3 = cnt_FixLength_3 * 4 - 4 + cnt_LastclkByte;
+
+// 测试长度方案3
+localparam cnt_FixLength_1 = 15;    // 第一种数据长度  250 可以
+localparam cnt_FixLength_2 = 15;    // 第二种数据长度
+localparam cnt_FixLength_3 = 15;    // 第三种数据长度
+localparam cnt_GapLength_1 = 16;    // 第一种间隙长度
+localparam cnt_GapLength_2 = 16;    // 第二种间隙长度
+localparam cnt_GapLength_3 = 16;    // 第三种间隙长度
 localparam keep_LastclkByte = 8; // 8 12 14 15 // 3 2 1 0
 localparam cnt_LastclkByte = 4 - $clog2(16-keep_LastclkByte);
 localparam cnt_FixLengthByte_1 = cnt_FixLength_1 * 4 - 4 + cnt_LastclkByte;

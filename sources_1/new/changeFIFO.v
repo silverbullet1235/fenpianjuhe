@@ -32,7 +32,7 @@ module changeFIFO(
     output  reg [4:0]   index       // 指示FIFO中有效字节的个数
 );
 wire [31:0]     Din_swap;
-reg  [319:0]    fifo_data;
+reg  [511:0]    fifo_data;
 assign Din_swap = {Din[7:0], Din[15:8], Din[23:16], Din[31:24]};
 integer i;
 always @(posedge clk) begin
@@ -67,14 +67,14 @@ always @(posedge clk) begin
                     Dout <= {fifo_data[7:0], 24'd0};
                     case(Din_index)
                         'd1: begin
-                            for(i=0; i<32; i=i+1) begin
+                            for(i=0; i<48; i=i+1) begin
                                 if(i < index - 1)          fifo_data[i*8+:8] <= fifo_data[i*8+8+:8];
                                 else if(i == index - 1)    fifo_data[i*8+:8] <= Din_swap[7:0];
                                 else                       fifo_data[i*8+:8] <= 8'd0;
                             end
                         end
                         'd2: begin
-                            for(i=0; i<32; i=i+1) begin
+                            for(i=0; i<64; i=i+1) begin
                                 if(i < index - 1)          fifo_data[i*8+:8] <= fifo_data[i*8+8+:8];
                                 else if(i == index - 1)    fifo_data[i*8+:8] <= Din_swap[7:0];
                                 else if(i == index)        fifo_data[i*8+:8] <= Din_swap[15:8];
@@ -82,7 +82,7 @@ always @(posedge clk) begin
                             end
                         end
                         'd3: begin
-                            for(i=0; i<32; i=i+1) begin
+                            for(i=0; i<64; i=i+1) begin
                                 if(i < index - 1)          fifo_data[i*8+:8] <= fifo_data[i*8+8+:8];
                                 else if(i == index - 1)    fifo_data[i*8+:8] <= Din_swap[7:0];
                                 else if(i == index)        fifo_data[i*8+:8] <= Din_swap[15:8];
@@ -91,7 +91,7 @@ always @(posedge clk) begin
                             end
                         end
                         'd4: begin
-                            for(i=0; i<32; i=i+1) begin
+                            for(i=0; i<64; i=i+1) begin
                                 if(i < index - 1)          fifo_data[i*8+:8] <= fifo_data[i*8+8+:8];
                                 else if(i == index - 1)    fifo_data[i*8+:8] <= Din_swap[7:0];
                                 else if(i == index)        fifo_data[i*8+:8] <= Din_swap[15:8];
@@ -107,14 +107,14 @@ always @(posedge clk) begin
                     Dout <= {fifo_data[7:0], fifo_data[15:8], 16'd0};
                     case(Din_index)
                         'd1: begin
-                            for(i=0; i<32; i=i+1) begin
+                            for(i=0; i<64; i=i+1) begin
                                 if(i < index - 2)          fifo_data[i*8+:8] <= fifo_data[i*8+16+:8];
                                 else if(i == index - 2)    fifo_data[i*8+:8] <= Din_swap[7:0];
                                 else                       fifo_data[i*8+:8] <= 8'd0;
                             end
                         end
                         'd2: begin
-                            for(i=0; i<32; i=i+1) begin
+                            for(i=0; i<64; i=i+1) begin
                                 if(i < index - 2)          fifo_data[i*8+:8] <= fifo_data[i*8+16+:8];
                                 else if(i == index - 2)    fifo_data[i*8+:8] <= Din_swap[7:0];
                                 else if(i == index - 1)    fifo_data[i*8+:8] <= Din_swap[15:8];
@@ -122,7 +122,7 @@ always @(posedge clk) begin
                             end
                         end
                         'd3: begin
-                            for(i=0; i<32; i=i+1) begin
+                            for(i=0; i<64; i=i+1) begin
                                 if(i < index - 2)          fifo_data[i*8+:8] <= fifo_data[i*8+16+:8];
                                 else if(i == index - 2)    fifo_data[i*8+:8] <= Din_swap[7:0];
                                 else if(i == index - 1)    fifo_data[i*8+:8] <= Din_swap[15:8];
@@ -131,7 +131,7 @@ always @(posedge clk) begin
                             end
                         end
                         'd4: begin
-                            for(i=0; i<32; i=i+1) begin
+                            for(i=0; i<64; i=i+1) begin
                                 if(i < index - 2)          fifo_data[i*8+:8] <= fifo_data[i*8+16+:8];
                                 else if(i == index - 2)    fifo_data[i*8+:8] <= Din_swap[7:0];
                                 else if(i == index - 1)    fifo_data[i*8+:8] <= Din_swap[15:8];
@@ -147,14 +147,14 @@ always @(posedge clk) begin
                     Dout <= {fifo_data[7:0], fifo_data[15:8], fifo_data[23:16], 8'd0};
                     case(Din_index)
                         'd1: begin
-                            for(i=0; i<32; i=i+1) begin
+                            for(i=0; i<64; i=i+1) begin
                                 if(i < index - 3)          fifo_data[i*8+:8] <= fifo_data[i*8+24+:8];
                                 else if(i == index - 3)    fifo_data[i*8+:8] <= Din_swap[7:0];
                                 else                       fifo_data[i*8+:8] <= 8'd0;
                             end
                         end
                         'd2: begin
-                            for(i=0; i<32; i=i+1) begin
+                            for(i=0; i<64; i=i+1) begin
                                 if(i < index - 3)          fifo_data[i*8+:8] <= fifo_data[i*8+24+:8];
                                 else if(i == index - 3)    fifo_data[i*8+:8] <= Din_swap[7:0];
                                 else if(i == index - 2)    fifo_data[i*8+:8] <= Din_swap[15:8];
@@ -162,7 +162,7 @@ always @(posedge clk) begin
                             end
                         end
                         'd3: begin
-                            for(i=0; i<32; i=i+1) begin
+                            for(i=0; i<64; i=i+1) begin
                                 if(i < index - 3)          fifo_data[i*8+:8] <= fifo_data[i*8+24+:8];
                                 else if(i == index - 3)    fifo_data[i*8+:8] <= Din_swap[7:0];
                                 else if(i == index - 2)    fifo_data[i*8+:8] <= Din_swap[15:8];
@@ -171,7 +171,7 @@ always @(posedge clk) begin
                             end
                         end
                         'd4: begin
-                            for(i=0; i<32; i=i+1) begin
+                            for(i=0; i<64; i=i+1) begin
                                 if(i < index - 3)          fifo_data[i*8+:8] <= fifo_data[i*8+24+:8];
                                 else if(i == index - 3)    fifo_data[i*8+:8] <= Din_swap[7:0];
                                 else if(i == index - 2)    fifo_data[i*8+:8] <= Din_swap[15:8];
@@ -187,14 +187,14 @@ always @(posedge clk) begin
                     Dout <= {fifo_data[7:0], fifo_data[15:8], fifo_data[23:16], fifo_data[31:24]};
                     case(Din_index)
                         'd1: begin
-                            for(i=0; i<32; i=i+1) begin
+                            for(i=0; i<64; i=i+1) begin
                                 if(i < index - 4)          fifo_data[i*8+:8] <= fifo_data[i*8+32+:8];
                                 else if(i == index - 4)    fifo_data[i*8+:8] <= Din_swap[7:0];
                                 else                       fifo_data[i*8+:8] <= 8'd0;
                             end
                         end
                         'd2: begin
-                            for(i=0; i<32; i=i+1) begin
+                            for(i=0; i<64; i=i+1) begin
                                 if(i < index - 4)          fifo_data[i*8+:8] <= fifo_data[i*8+32+:8];
                                 else if(i == index - 4)    fifo_data[i*8+:8] <= Din_swap[7:0];
                                 else if(i == index - 3)    fifo_data[i*8+:8] <= Din_swap[15:8];
@@ -202,7 +202,7 @@ always @(posedge clk) begin
                             end
                         end
                         'd3: begin
-                            for(i=0; i<32; i=i+1) begin
+                            for(i=0; i<64; i=i+1) begin
                                 if(i < index - 4)          fifo_data[i*8+:8] <= fifo_data[i*8+32+:8];
                                 else if(i == index - 4)    fifo_data[i*8+:8] <= Din_swap[7:0];
                                 else if(i == index - 3)    fifo_data[i*8+:8] <= Din_swap[15:8];
@@ -211,7 +211,7 @@ always @(posedge clk) begin
                             end
                         end
                         'd4: begin
-                            for(i=0; i<32; i=i+1) begin
+                            for(i=0; i<64; i=i+1) begin
                                 if(i < index - 4)          fifo_data[i*8+:8] <= fifo_data[i*8+32+:8];
                                 else if(i == index - 4)    fifo_data[i*8+:8] <= Din_swap[7:0];
                                 else if(i == index - 3)    fifo_data[i*8+:8] <= Din_swap[15:8];
@@ -229,22 +229,22 @@ always @(posedge clk) begin
                 'd0: Dout <= 32'd0;
                 'd1: begin
                     Dout <= {fifo_data[7:0], 24'd0};
-                    fifo_data <= {8'd0, fifo_data[255:8]};
+                    fifo_data <= {8'd0, fifo_data[511:8]};
                     index <= index - 1;
                 end
                 'd2: begin
                     Dout <= {fifo_data[7:0], fifo_data[15:8], 16'd0};
-                    fifo_data <= {16'd0, fifo_data[255:16]};
+                    fifo_data <= {16'd0, fifo_data[511:16]};
                     index <= index - 2;
                 end
                 'd3: begin
                     Dout <= {fifo_data[7:0], fifo_data[15:8], fifo_data[23:16], 8'd0};
-                    fifo_data <= {24'd0, fifo_data[255:24]};
+                    fifo_data <= {24'd0, fifo_data[511:24]};
                     index <= index - 3;
                 end
                 'd4: begin
                     Dout <= {fifo_data[7:0], fifo_data[15:8], fifo_data[23:16], fifo_data[31:24]};
-                    fifo_data <= {32'd0, fifo_data[255:32]};
+                    fifo_data <= {32'd0, fifo_data[511:32]};
                     index <= index - 4;
                 end
                 default: ;

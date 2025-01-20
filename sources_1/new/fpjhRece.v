@@ -597,7 +597,7 @@ always @(posedge clk) begin
             end
 
             READ_DATA2: begin
-                if (4 * fifo2_read_cycles < total_bytes_to_read2 + 'd16 - changeFIFO_remainLen) begin //
+                if (4 * fifo2_read_cycles < total_bytes_to_read2 + 'd12 - changeFIFO_remainLen) begin //
                     fifo2DataRd <= 1'b1;
                     fifo2_read_cycles <= fifo2_read_cycles + 1'b1;
                 end 
