@@ -46,33 +46,31 @@
 // 
 // DO NOT MODIFY THIS FILE.
 
-// IP VLNV: xilinx.com:ip:fifo_generator:13.2
-// IP Revision: 4
+// IP VLNV: xilinx.com:ip:blk_mem_gen:8.4
+// IP Revision: 3
 
 // The following must be inserted into your Verilog file for this
 // core to be instantiated. Change the instance name and port connections
 // (in parentheses) to your own signal names.
 
 //----------- Begin Cut here for INSTANTIATION Template ---// INST_TAG
-fifo_Fpjh_data_2 your_instance_name (
-  .clk(clk),                    // input wire clk
-  .srst(srst),                  // input wire srst
-  .din(din),                    // input wire [31 : 0] din
-  .wr_en(wr_en),                // input wire wr_en
-  .rd_en(rd_en),                // input wire rd_en
-  .dout(dout),                  // output wire [31 : 0] dout
-  .full(full),                  // output wire full
-  .almost_full(almost_full),    // output wire almost_full
-  .empty(empty),                // output wire empty
-  .almost_empty(almost_empty),  // output wire almost_empty
-  .valid(valid),                // output wire valid
-  .data_count(data_count),      // output wire [12 : 0] data_count
-  .prog_full(prog_full),        // output wire prog_full
-  .prog_empty(prog_empty)      // output wire prog_empty
+lenRece your_instance_name (
+  .clka(clka),    // input wire clka
+  .ena(ena),      // input wire ena
+  .wea(wea),      // input wire [0 : 0] wea
+  .addra(addra),  // input wire [3 : 0] addra
+  .dina(dina),    // input wire [11 : 0] dina
+  .douta(douta),  // output wire [11 : 0] douta
+  .clkb(clkb),    // input wire clkb
+  .enb(enb),      // input wire enb
+  .web(web),      // input wire [0 : 0] web
+  .addrb(addrb),  // input wire [3 : 0] addrb
+  .dinb(dinb),    // input wire [11 : 0] dinb
+  .doutb(doutb)  // output wire [11 : 0] doutb
 );
 // INST_TAG_END ------ End INSTANTIATION Template ---------
 
-// You must compile the wrapper file fifo_Fpjh_data_2.v when simulating
-// the core, fifo_Fpjh_data_2. When compiling the wrapper file, be sure to
+// You must compile the wrapper file lenRece.v when simulating
+// the core, lenRece. When compiling the wrapper file, be sure to
 // reference the Verilog simulation library.
 

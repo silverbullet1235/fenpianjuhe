@@ -1,11 +1,6 @@
- 
- 
- 
- 
- 
-
 ################################################################################
-# (c) Copyright 2009 - 2013 Xilinx, Inc. All rights reserved.
+#
+# (c) Copyright 2002 - 2013 Xilinx, Inc. All rights reserved.
 # 
 # This file contains confidential and proprietary information
 # of Xilinx, Inc. and is protected under U.S. and
@@ -53,12 +48,11 @@
 #
 ################################################################################
 
-#------------------------------------------------------------------------------#
-#                         Native FIFO Constraints                              #
-#------------------------------------------------------------------------------#
-
-
-
-
+# Core Period Constraint. This constraint can be modified, and is
+# valid as long as it is met after place and route.
+create_clock -name "TS_CLKA" -period 20.0 [ get_ports clka ]
+    set_property HD.CLK_SRC BUFGCTRL_X0Y0 [ get_ports clka ]
+  
+create_clock -name "TS_CLKB" -period 20.0 [ get_ports clkb ]
+    set_property HD.CLK_SRC BUFGCTRL_X0Y1 [ get_ports clkb ]
 ################################################################################
-

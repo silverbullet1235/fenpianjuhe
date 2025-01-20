@@ -27,18 +27,18 @@ module writeChange_FIFO(
     input               clk         ,
     input               rst_n       ,
     input       [31:0]  Din         ,
-    input       [3:0]   Din_index   ,// 指示输入数据的有效字节所在的位置
+    input       [3:0]   Din_index   ,
     input               wr_en       ,
     output  reg [31:0]  Dout        ,
     output  reg         Dout_valid  ,
-    output  reg [3:0]   index       // 指示fifo_data中有效字节的位置，即FIFO中有效字节的个数
+    output  reg [3:0]   index       
 );
 
 wire [31:0]     Din_swap;
 wire            Dout_validw;
-reg [127+32:0]  fifo_data   ;// 内部缓存 缓存达到或者超过4字节时，输出一个完整的32字节 ///fifo_data[127:0]为暂存区，高32保留
+reg [127+32:0]  fifo_data   ;
 
-assign Din_swap     = {Din[7:0], Din[15:8], Din[23:16], Din[31:24]};// 字节交换
+assign Din_swap     = {Din[7:0], Din[15:8], Din[23:16], Din[31:24]};
 assign Dout_validw  = index >= 4;
 
 integer i;
@@ -47,14 +47,14 @@ always @(posedge clk ) begin
         index      <= 'd0   ;
         fifo_data[127:0]  <= 'd0   ;
     end else begin
-        if( wr_en && Dout_validw ) begin// wr_en Dout_validw 同时为1时，输出一个完整的32字节
+        if( wr_en && Dout_validw ) begin
             case ( Din_index )
-                'd0 : begin             // 状态多余，仿真时去掉 跟else if( Dout_validw ) begin有点重复，也就是为什么会出现无Din_index指示，但是wr_en会有拉高
+                'd0 : begin            
                     Dout        <= { fifo_data[7:0], fifo_data[15:8], fifo_data[23:16], fifo_data[31:24] }  ;
                     fifo_data[127:0]   <= { 32'd0, fifo_data[95:32] } ;
                     index       <= index - 4        ;
                 end
-                'd1 : begin             // 最低的4个字节输出，最高的3字节输入0，第四个高字节输入1字节数据
+                'd1 : begin 
                     Dout                        <= { fifo_data[7:0], fifo_data[15:8], fifo_data[23:16], fifo_data[31:24] }  ;
                     for(i=0; i<16; i=i+1) begin
                         if( i < index - 4 )         fifo_data[i*8+:8] <= fifo_data[i*8+32+:8]   ;
@@ -104,11 +104,11 @@ always @(posedge clk ) begin
                 end
                 default:;
             endcase
-        end else if( Dout_validw ) begin// Dout_validw 为真，wr_en为假时，输出一个完整的32字节 //感觉这个状态达不到很高
+        end else if( Dout_validw ) begin
             Dout        <= { fifo_data[7:0], fifo_data[15:8], fifo_data[23:16], fifo_data[31:24] }  ;
             fifo_data[127:0]   <= { 32'd0, fifo_data[95:32] } ;
             index       <= index - 4        ;
-        end else if( wr_en ) begin// wr_en 为真，Dout_validw 为假时，输入数据
+        end else if( wr_en ) begin
             case ( Din_index )
                 'd1 : begin
                     fifo_data[index*8+:8]       <= Din_swap[7:0]    ;
@@ -128,7 +128,7 @@ always @(posedge clk ) begin
                 end
                 default:;
             endcase
-        end else begin// wr_en 为假时，保持内部缓存
+        end else begin
             fifo_data               <= fifo_data  ;
             index                   <= index      ;
         end

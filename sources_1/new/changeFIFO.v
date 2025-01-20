@@ -31,15 +31,9 @@ module changeFIFO(
     output  reg [31:0]  Dout        ,
     output  reg [4:0]   index       // 指示FIFO中有效字节的个数
 );
-
 wire [31:0]     Din_swap;
-// reg  [255:0]    fifo_data;  // 32字节暂存区
-reg  [319:0]    fifo_data;  //  1272
-// reg  [287:0]    fifo_data;  // 32字节暂存区 6880
-// reg  [511:0]    fifo_data;  // 6720
-
+reg  [319:0]    fifo_data;
 assign Din_swap = {Din[7:0], Din[15:8], Din[23:16], Din[31:24]};
-
 integer i;
 always @(posedge clk) begin
     if (!rst_n) begin
@@ -67,7 +61,6 @@ always @(posedge clk) begin
                             fifo_data[index*8+:32] <= Din_swap;
                             index <= index + 4;
                         end
-                        default: ;
                     endcase
                 end
                 'd1: begin
@@ -107,7 +100,6 @@ always @(posedge clk) begin
                                 else                       fifo_data[i*8+:8] <= 8'd0;
                             end
                         end
-                        default: ;
                     endcase
                     index <= index - 1 + Din_index;
                 end
@@ -148,7 +140,6 @@ always @(posedge clk) begin
                                 else                       fifo_data[i*8+:8] <= 8'd0;
                             end
                         end
-                        default: ;
                     endcase
                     index <= index - 2 + Din_index;
                 end
@@ -189,7 +180,6 @@ always @(posedge clk) begin
                                 else                       fifo_data[i*8+:8] <= 8'd0;
                             end
                         end
-                        default: ;
                     endcase
                     index <= index - 3 + Din_index;
                 end
@@ -230,11 +220,9 @@ always @(posedge clk) begin
                                 else                       fifo_data[i*8+:8] <= 8'd0;
                             end
                         end
-                        default: ;
                     endcase
                     index <= index - 4 + Din_index;
                 end
-                default: ;
             endcase
         end else if (rd_en) begin  // 只读
             case (Dout_index)

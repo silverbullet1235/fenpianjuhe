@@ -31,12 +31,9 @@ module readChange_FIFO(
     output  reg [31:0]  Dout        ,
     output  reg [3:0]   index       
 );
-
 wire [31:0]  Din_swap;
-reg [255:0]  fifo_data   ;// 16字节暂存区
-
+reg [255:0]  fifo_data   ;
 assign Din_swap = {Din[7:0], Din[15:8], Din[23:16], Din[31:24]};
-
 integer i;
 always @(posedge clk ) begin
     if( !rst_n ) begin

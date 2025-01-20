@@ -42,8 +42,7 @@ module addFrameHead(
     output reg              m_axis_tlast	= 'd0,		// 输出数据最后一拍
     input wire              m_axis_tready				// 下游准备接收
 );
-
-wire [3:0]	fragOutNoneCrc_DoutKeep_dec;// 输入数据字节有效 //dec
+wire [3:0]	fragOutNoneCrc_DoutKeep_dec;
 assign		fragOutNoneCrc_DoutKeep_dec = (fragOutNoneCrc_DoutKeep == 4'h8) ? 4'd1 : (fragOutNoneCrc_DoutKeep == 4'hC) ? 4'd2 : 
 										(fragOutNoneCrc_DoutKeep == 4'hE) ? 4'd3 :	(fragOutNoneCrc_DoutKeep == 4'hF) ? 4'd4 : 4'd0; // 默认值
 
@@ -63,8 +62,6 @@ assign DinDyn_tvalid	= (frameType_16Bit[0]== 1'b1)?DinNdDy2 : DinNdDy1;
 assign DinDyn_tdata		= (frameType_16Bit[0]== 1'b1)?DinDy2 : DinDy1;
 assign DinDyn_tkeep		= (frameType_16Bit[0]== 1'b1)?DinKeep2 : DinKeep1;
 assign DinDyn_tlast		= (frameType_16Bit[0]== 1'b1)?DinLast2 : DinLast1;
-
-
 always @(posedge clk) begin
 	if(rst) begin
 		m_axis_tdata <= 'd0;
@@ -80,7 +77,6 @@ always @(posedge clk) begin
 		DinDyn_tdataDy <= DinDyn_tdata;
 		DinDyn_tkeepDy <= DinDyn_tkeep;
 		DinDyn_tlastDy <= DinDyn_tlast;
-
 		case(state)
 			'd0:begin
 				m_axis_tdata	<= 'd0;
@@ -100,9 +96,7 @@ always @(posedge clk) begin
 					end
 				end
 			end
-				// {4'b0,fragment_length,frameType_16Bit,dataFragCnt_rd,fragdone_rd}
-				// {4'b0,fragment_length,frameType_16Bit,dataFragCnt_rd,fragdone_rd,frameType_16Bit,frameAggrOffset_length}
-			'd1:begin //帧聚合时，多一拍
+			'd1:begin
 				m_axis_tdata	<= {dataFragCnt_rd,fragdone_rd,frameType_16Bit,4'b0,frameAggrOffset_length[11-:4]};
 				m_axis_tkeep	<= 'd4;
 				m_axis_tvalid	<= 'd1;
@@ -110,7 +104,7 @@ always @(posedge clk) begin
 				state <= state + 'd1;
 			end
 			'd2:begin
-				if(DinDyn_tlast)begin //输入数据长度只有1、2、3字节 //考虑一下下一拍的状态
+				if(DinDyn_tlast)begin
 					state <= 'd255;
 					case(DinDyn_tkeep)
 						'd1:begin
@@ -142,7 +136,6 @@ always @(posedge clk) begin
 							m_axis_tlast <= 'd0;
 						end
 					endcase
-					
 				end
 				else begin
 						m_axis_tdata	<= (frameType_16Bit[0]== 1'b1)?{frameAggrOffset_length[0+:8], DinDyn_tdata[31-:24]} :
@@ -154,9 +147,9 @@ always @(posedge clk) begin
 				end
 			end
 			'd255:begin //处理数据last之后的一拍 （因为要填充CRC）
-					if(DinDyn_tlastDy)begin
-						state <= 'd0;
-						case(DinDyn_tkeepDy)
+				if(DinDyn_tlastDy)begin
+					state <= 'd0;
+					case(DinDyn_tkeepDy)
 						'd1:begin
 							m_axis_tdata	<= {32'd0}	;
 							m_axis_tkeep <= 'd0;
@@ -181,37 +174,37 @@ always @(posedge clk) begin
 							m_axis_tvalid <= 'd1;
 							m_axis_tlast <= 'd1;
 						end
-						endcase
-					end
+					endcase
+				end
 			end
 			default:begin
 				if(DinDyn_tlast)begin 
 					state <= 'd255;
 					case(DinDyn_tkeep)
-					'd1:begin
-						m_axis_tdata	<= {DinDyn_tdataDy[0+:8], DinDyn_tdata[31-:8*1], 16'd0}	;// 两字节CRC
-						m_axis_tkeep <= 'd4;
-						m_axis_tvalid <= 'd1;
-						m_axis_tlast <= 'd1;
-					end
-					'd2:begin
-						m_axis_tdata	<= {DinDyn_tdataDy[0+:8], DinDyn_tdata[31-:8*2], 8'd0}	;// 一字节CRC
-						m_axis_tkeep <= 'd4;
-						m_axis_tvalid <= 'd1;
-						m_axis_tlast <= 'd0;
-					end
-					'd3:begin
-						m_axis_tdata	<= {DinDyn_tdataDy[0+:8], DinDyn_tdata[31-:8*3]}	;
-						m_axis_tkeep <= 'd4;
-						m_axis_tvalid <= 'd1;
-						m_axis_tlast <= 'd0;
-					end
-					'd4:begin
-						m_axis_tdata	<= {DinDyn_tdataDy[0+:8], DinDyn_tdata[31-:8*3]}	;
-						m_axis_tkeep <= 'd4;
-						m_axis_tvalid <= 'd1;
-						m_axis_tlast <= 'd0;
-					end
+						'd1:begin
+							m_axis_tdata	<= {DinDyn_tdataDy[0+:8], DinDyn_tdata[31-:8*1], 16'd0}	;
+							m_axis_tkeep <= 'd4;
+							m_axis_tvalid <= 'd1;
+							m_axis_tlast <= 'd1;
+						end
+						'd2:begin
+							m_axis_tdata	<= {DinDyn_tdataDy[0+:8], DinDyn_tdata[31-:8*2], 8'd0}	;
+							m_axis_tkeep <= 'd4;
+							m_axis_tvalid <= 'd1;
+							m_axis_tlast <= 'd0;
+						end
+						'd3:begin
+							m_axis_tdata	<= {DinDyn_tdataDy[0+:8], DinDyn_tdata[31-:8*3]}	;
+							m_axis_tkeep <= 'd4;
+							m_axis_tvalid <= 'd1;
+							m_axis_tlast <= 'd0;
+						end
+						'd4:begin
+							m_axis_tdata	<= {DinDyn_tdataDy[0+:8], DinDyn_tdata[31-:8*3]}	;
+							m_axis_tkeep <= 'd4;
+							m_axis_tvalid <= 'd1;
+							m_axis_tlast <= 'd0;
+						end
 					endcase
 				end
 				else begin

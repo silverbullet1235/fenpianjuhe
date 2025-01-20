@@ -46,28 +46,26 @@
 -- 
 -- DO NOT MODIFY THIS FILE.
 
--- IP VLNV: xilinx.com:ip:fifo_generator:13.2
--- IP Revision: 4
+-- IP VLNV: xilinx.com:ip:blk_mem_gen:8.4
+-- IP Revision: 3
 
 -- The following code must appear in the VHDL architecture header.
 
 ------------- Begin Cut here for COMPONENT Declaration ------ COMP_TAG
-COMPONENT fifo_Fpjh_data_2
+COMPONENT lenRece
   PORT (
-    clk : IN STD_LOGIC;
-    srst : IN STD_LOGIC;
-    din : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-    wr_en : IN STD_LOGIC;
-    rd_en : IN STD_LOGIC;
-    dout : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-    full : OUT STD_LOGIC;
-    almost_full : OUT STD_LOGIC;
-    empty : OUT STD_LOGIC;
-    almost_empty : OUT STD_LOGIC;
-    valid : OUT STD_LOGIC;
-    data_count : OUT STD_LOGIC_VECTOR(12 DOWNTO 0);
-    prog_full : OUT STD_LOGIC;
-    prog_empty : OUT STD_LOGIC
+    clka : IN STD_LOGIC;
+    ena : IN STD_LOGIC;
+    wea : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    addra : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+    dina : IN STD_LOGIC_VECTOR(11 DOWNTO 0);
+    douta : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+    clkb : IN STD_LOGIC;
+    enb : IN STD_LOGIC;
+    web : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    addrb : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+    dinb : IN STD_LOGIC_VECTOR(11 DOWNTO 0);
+    doutb : OUT STD_LOGIC_VECTOR(11 DOWNTO 0)
   );
 END COMPONENT;
 -- COMP_TAG_END ------ End COMPONENT Declaration ------------
@@ -76,26 +74,24 @@ END COMPONENT;
 -- body. Substitute your own instance name and net names.
 
 ------------- Begin Cut here for INSTANTIATION Template ----- INST_TAG
-your_instance_name : fifo_Fpjh_data_2
+your_instance_name : lenRece
   PORT MAP (
-    clk => clk,
-    srst => srst,
-    din => din,
-    wr_en => wr_en,
-    rd_en => rd_en,
-    dout => dout,
-    full => full,
-    almost_full => almost_full,
-    empty => empty,
-    almost_empty => almost_empty,
-    valid => valid,
-    data_count => data_count,
-    prog_full => prog_full,
-    prog_empty => prog_empty
+    clka => clka,
+    ena => ena,
+    wea => wea,
+    addra => addra,
+    dina => dina,
+    douta => douta,
+    clkb => clkb,
+    enb => enb,
+    web => web,
+    addrb => addrb,
+    dinb => dinb,
+    doutb => doutb
   );
 -- INST_TAG_END ------ End INSTANTIATION Template ---------
 
--- You must compile the wrapper file fifo_Fpjh_data_2.vhd when simulating
--- the core, fifo_Fpjh_data_2. When compiling the wrapper file, be sure to
+-- You must compile the wrapper file lenRece.vhd when simulating
+-- the core, lenRece. When compiling the wrapper file, be sure to
 -- reference the VHDL simulation library.
 
